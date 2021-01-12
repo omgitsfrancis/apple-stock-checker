@@ -42,13 +42,14 @@ const timerTrigger: AzureFunction = async function (context: Context, myTimer: a
   if (resultStatus === "available") {
     const phoneNumbers = process.env["PhoneNumbers"];
     const host = process.env["FunctionHost"]
+    const apiKey = process.env["SendTextApiKey"];
     const message = `
       ${resultMessage}
       ${productPage}
   `;
 
     phoneNumbers.split(",").forEach(async (num) => {
-      await axios.post(`${host}/api/SendText`, { phoneNumber: num, message: message })
+      await axios.post(`${host}/api/SendText?code=${apiKey}`, { phoneNumber: num, message: message })
     });
   }
 };
