@@ -1,12 +1,14 @@
-import { AzureFunction, Context, HttpRequest } from "@azure/functions";
+import { AzureFunction, Context } from "@azure/functions";
 import axios from "axios";
 import * as _ from "lodash";
 
-const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
-  const productId = req.query["productId"];
+const timerTrigger: AzureFunction = async function (context: Context, myTimer: any): Promise<void> {
+  var timeStamp = new Date().toISOString();
+
+  const productId = process.env["ProductId"];
   const requestUrl = `https://www.apple.com/shop/delivery-message?parts.0=${productId}`;
   var productPage, resultMessage, resultStatus;
-  
+
   context.log(`Checking stock for Apple Product ${productId}`);
 
   await axios
@@ -23,7 +25,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
       } else if (isBuyable === undefined) {
         resultStatus = "error";
         resultMessage = `Please confirm product ID is valid. Product ID: ${productId}`;
-        context.log(resultStatus);
+        context.log(resultMessage);
       } else {
         resultStatus = "soldout";
         productPage = `https://www.apple.com/shop/product/${productId}`;
@@ -37,13 +39,18 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
       context.log(resultMessage);
     });
 
-  context.res = {
-    body: {
-      status: resultStatus,
-      message: resultMessage,
-      productPage: productPage,
-    },
-  };
+  if (resultStatus === "available") {
+    const phoneNumbers = process.env["PhoneNumbers"];
+    const host = process.env["FunctionHost"]
+    const message = `
+      ${resultMessage}
+      ${productPage}
+  `;
+
+    phoneNumbers.split(",").forEach(async (num) => {
+      await axios.post(`${host}/api/SendText`, { phoneNumber: num, message: message })
+    });
+  }
 };
 
-export default httpTrigger;
+export default timerTrigger;
