@@ -1,5 +1,5 @@
 {
-  "name": "",
+  "name": "apple-stock-checker",
   "version": "",
   "scripts": {
     "build": "tsc",

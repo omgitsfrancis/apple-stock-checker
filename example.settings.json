@@ -1,0 +1,13 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "node",
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FunctionHost": "http://localhost:7071",
+    "SendTextApiKey": "",
+    "ProductId": "MU8F2AM/A",
+    "TwilioAccountSid": "",
+    "TwilioAuthToken": "",
+    "PhoneNumbers": "+15555555555,+15555555556"
+  }
+}
